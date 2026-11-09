@@ -1,0 +1,8 @@
+{
+  "games": [
+    { "idp": "0", "dia_partido": "FASE", "hora_partido": "4951", "home_name": "LLIGA PROVA 1", "home_logo": "https://sidgad.example/logos/--", "away_name": "--", "away_logo": "https://sidgad.example/logos/--", "result": "--", "home_bonus": "--", "away_bonus": "--", "home_id": null, "away_id": null, "home_club_id": null, "away_club_id": null, "url_video": null, "tipo_video": null, "pista": null },
+    { "idp": "0", "dia_partido": "JORNADA", "hora_partido": "_", "home_name": "JORNADA 1", "home_logo": "https://sidgad.example/logos/--", "away_name": "--", "away_logo": "https://sidgad.example/logos/--", "result": "--", "home_bonus": "--", "away_bonus": "--", "home_id": null, "away_id": null, "home_club_id": null, "away_club_id": null, "url_video": null, "tipo_video": null, "pista": null },
+    { "idp": "900501", "dia_partido": "26/09/2026", "hora_partido": "12:30", "home_name": "CP PROVA  B", "home_logo": "https://sidgad.example/logos/1", "away_name": "CH FICTICI", "away_logo": "https://sidgad.example/logos/2", "result": "2:8", "home_bonus": "", "away_bonus": "", "home_id": "900101", "away_id": "900102", "home_club_id": "900001", "away_club_id": "900002", "url_video": null, "tipo_video": null, "pista": "PAVELLO PROVA" },
+    { "idp": "900502", "dia_partido": "08/11/2026", "hora_partido": "", "home_name": "CH FICTICI", "home_logo": "https://sidgad.example/logos/2", "away_name": "CLUB IMAGINARI", "away_logo": "https://sidgad.example/logos/3", "result": "", "home_bonus": "", "away_bonus": "", "home_id": "900102", "away_id": "900103", "home_club_id": "900002", "away_club_id": "900003", "url_video": null, "tipo_video": null, "pista": null }
+  ]
+}
