@@ -1,0 +1,57 @@
+{
+  "name": "fecapa-sync",
+  "version": "0.1.0",
+  "description": "Read FECAPA (Federació Catalana de Patinatge) roller hockey fixtures and match reports.",
+  "license": "MIT",
+  "author": "Jordi Medina",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmedinafruitos/fecapa-sync.git"
+  },
+  "homepage": "https://github.com/jmedinafruitos/fecapa-sync#readme",
+  "bugs": "https://github.com/jmedinafruitos/fecapa-sync/issues",
+  "keywords": [
+    "fecapa",
+    "hoquei",
+    "roller-hockey",
+    "sidgad",
+    "calendar"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.20.5",
+    "eslint": "^10.14.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.72.1"
+  }
+}
