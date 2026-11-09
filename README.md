@@ -4,7 +4,7 @@ Llibreria de codi obert per llegir calendaris i actes d'hoquei patins de la
 FECAPA (Federació Catalana de Patinatge), independent de qualsevol club.
 
 > **Estat:** pre-1.0. L'API pot canviar entre versions 0.x. Encara no està
-> publicada a npm. Vegeu [`docs/PLAN.md`](docs/PLAN.md).
+> publicada a npm. Vegeu [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Instal·lació
 
@@ -67,7 +67,7 @@ server-rendered HTML (`legacy-html`), tried in that order. Errors are
 `FecapaError`s with a stable `code` (`HTTP_ERROR`, `SOURCE_FORMAT_CHANGED`,
 `TEAMS_MISMATCH`, …). The client is polite: honest User-Agent, one request at a
 time, a configurable delay between requests. See the Catalan example above and
-[`docs/PLAN.md`](docs/PLAN.md).
+[`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Llicència
 
