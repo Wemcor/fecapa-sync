@@ -1,0 +1,23 @@
+{
+  "game_data": {
+    "game_id": "900501", "season_id": "99", "tournament_name": "LLIGA PROVA 1", "game_info": "", "ref_name1": "ARBITRE PROVA", "ref_name2": "",
+    "venue_info": "PAVELLO PROVA", "url_video": null, "tipo_video": null,
+    "home_team_id": "900101", "away_team_id": "900102", "home_team_name": "CP PROVA B", "away_team_name": "CH FICTICI",
+    "home_logo": "", "away_logo": "", "period_name": "FINAL", "period": "4",
+    "home_team_score": "2", "away_team_score": "8", "home_team_penals": "", "away_team_penals": "",
+    "game_date": "26/09/2026", "game_hour": "12:30", "game_time": "00:00", "game_completed": "true", "shootout": null,
+    "home_roster": [
+      { "player_id": "900001", "player_name": "PROVA TEST,JÚLIA", "player_number": "7", "player_role": "", "player_flag": null, "is_captain": true, "5i": true, "goals": "2", "asist": "0", "penals": "0", "direct": "0", "fault_com": 1, "fault_rec": 0, "yellow_card": 1, "blue_card": 0, "red_card": 0 },
+      { "player_id": "900002", "player_name": "FICTICI SEGON,PAU", "player_number": "1", "player_role": "POR", "player_flag": null, "is_captain": false, "5i": true, "goals": "", "asist": "", "penals": "", "direct": "", "fault_com": 0, "fault_rec": 0, "yellow_card": 0, "blue_card": 0, "red_card": 0 }
+    ],
+    "home_goalies": [],
+    "home_staff": [{ "staff_name": "ENTRENADORA PROVA", "staff_role": "E1", "staff_flag": null }],
+    "away_roster": [
+      { "player_id": "900003", "player_name": "PROVA TERCER,NIL", "player_number": "10", "player_role": null, "player_flag": null, "is_captain": false, "5i": true, "goals": "3", "asist": "1", "penals": "0", "direct": "0", "fault_com": 0, "fault_rec": 1, "yellow_card": 0, "blue_card": "2", "red_card": 0 }
+    ],
+    "away_goalies": [],
+    "away_staff": [],
+    "events": null,
+    "last_update": "2026-09-26 14:10:00"
+  }
+}

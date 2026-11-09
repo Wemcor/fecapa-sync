@@ -1,0 +1,44 @@
+{
+  "game_data": {
+    "game_id": "900501",
+    "season_id": "99",
+    "tournament_name": "LLIGA PROVA 1",
+    "game_info": "",
+    "ref_name1": "ARBITRE PROVA",
+    "ref_name2": "",
+    "venue_info": "PAVELLO PROVA",
+    "url_video": null,
+    "tipo_video": null,
+    "home_team_id": "900101",
+    "away_team_id": "900102",
+    "home_team_name": "CP PROVA B",
+    "away_team_name": "CH FICTICI",
+    "home_logo": "",
+    "away_logo": "",
+    "period_name": "",
+    "period": "4",
+    "home_team_score": "",
+    "away_team_score": "",
+    "home_team_penals": "",
+    "away_team_penals": "",
+    "game_date": "26/09/2026",
+    "game_hour": "12:30",
+    "game_time": "00:00",
+    "game_completed": "false",
+    "shootout": null,
+    "home_roster": [],
+    "home_goalies": [],
+    "home_staff": [
+      {
+        "staff_name": "ENTRENADORA PROVA",
+        "staff_role": "E1",
+        "staff_flag": null
+      }
+    ],
+    "away_roster": [],
+    "away_goalies": [],
+    "away_staff": [],
+    "events": null,
+    "last_update": "2026-09-26 14:10:00"
+  }
+}
