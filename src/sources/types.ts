@@ -1,6 +1,6 @@
 import type { HttpClient } from "../http.js";
-import type { ReportRequest } from "../parsers/sidgad-json.js";
-import type { Match, Report, SourceName } from "../types.js";
+import type { FullReportRequest, ReportOutcome } from "../parsers/sidgad-json.js";
+import type { Match, SourceName } from "../types.js";
 
 /** Everything a source needs for one client operation. */
 export type SourceContext = {
@@ -15,6 +15,8 @@ export type SourceContext = {
    * `portal-config` and `legacy-html` share a single download of the same page.
    */
   getPage(url: string): Promise<string>;
+  /** Values kept for the lifetime of the client (e.g. the portal's public SIDGAD config). */
+  cache: Map<string, unknown>;
 };
 
 export interface CalendarSource {
@@ -27,7 +29,8 @@ export interface CalendarSource {
 export interface ReportSource {
   readonly name: SourceName;
   canRun(ctx: SourceContext): boolean;
-  getReport(request: ReportRequest, ctx: SourceContext): Promise<Report | null>;
+  /** Both lineups of a final report, or why there is none yet. */
+  getReport(request: FullReportRequest, ctx: SourceContext): Promise<ReportOutcome>;
 }
 
 export const calendarPageUrl = (baseUrl: string, competitionId: number) =>

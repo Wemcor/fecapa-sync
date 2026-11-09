@@ -9,6 +9,7 @@ export type HttpOptions = {
   /** Minimum pause between the end of one request and the start of the next. */
   delayMs: number;
   timeoutMs: number;
+  sleep?: (ms: number) => Promise<void>;
 };
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -41,7 +42,7 @@ export class HttpClient {
 
   private async request(url: string, headers: Record<string, string>): Promise<string> {
     const wait = this.lastFinishedAt + this.options.delayMs - Date.now();
-    if (wait > 0) await sleep(wait);
+    if (wait > 0) await (this.options.sleep ?? sleep)(wait);
     const safeUrl = redactUrl(url);
     try {
       let response: Response;

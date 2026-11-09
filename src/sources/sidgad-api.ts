@@ -1,5 +1,5 @@
 import { sidgadUrl } from "../parsers/portal-config.js";
-import { parseCalendarJson, parseReportJson } from "../parsers/sidgad-json.js";
+import { parseCalendarJson, parseReportOutcomeJson } from "../parsers/sidgad-json.js";
 import type { CalendarSource, ReportSource } from "./types.js";
 import { sidgadHeaders } from "./types.js";
 
@@ -20,6 +20,6 @@ export const sidgadApiReport: ReportSource = {
   canRun: (ctx) => Boolean(ctx.token),
   async getReport(request, ctx) {
     const url = sidgadUrl(ctx.apiUrl, "report", request.matchId, ctx.token!);
-    return parseReportJson(await ctx.http.getJson(url, NAME, sidgadHeaders(ctx)), request, NAME);
+    return parseReportOutcomeJson(await ctx.http.getJson(url, NAME, sidgadHeaders(ctx)), request, NAME);
   },
 };
