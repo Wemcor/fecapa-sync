@@ -8,7 +8,7 @@
     "game_date": "26/09/2026", "game_hour": "12:30", "game_time": "00:00", "game_completed": "true", "shootout": null,
     "home_roster": [
       { "player_id": "900001", "player_name": "PROVA TEST,JÚLIA", "player_number": "7", "player_role": "", "player_flag": null, "is_captain": true, "5i": true, "goals": "2", "asist": "0", "penals": "0", "direct": "0", "fault_com": 1, "fault_rec": 0, "yellow_card": 1, "blue_card": 0, "red_card": 0 },
-      { "player_id": "900002", "player_name": "FICTICI SEGON,PAU", "player_number": "1", "player_role": "POR", "player_flag": null, "is_captain": false, "5i": true, "goals": "", "asist": "", "penals": "", "direct": "", "fault_com": 0, "fault_rec": 0, "yellow_card": 0, "blue_card": 0, "red_card": 0 }
+      { "player_id": "900002", "player_name": "FICTICI SEGON,PAU", "player_number": "1", "player_role": "P", "player_flag": null, "is_captain": false, "5i": true, "goals": "", "asist": "", "penals": "", "direct": "", "fault_com": 0, "fault_rec": 0, "yellow_card": 0, "blue_card": 0, "red_card": 0 }
     ],
     "home_goalies": [],
     "home_staff": [{ "staff_name": "ENTRENADORA PROVA", "staff_role": "E1", "staff_flag": null }],

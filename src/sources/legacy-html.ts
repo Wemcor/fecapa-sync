@@ -1,5 +1,5 @@
 import { formatChanged } from "../parsers/common.js";
-import { parseCalendarHtml, parseReportHtml } from "../parsers/legacy-html.js";
+import { parseCalendarHtml, parseFullReportHtml } from "../parsers/legacy-html.js";
 import type { CalendarSource, ReportSource } from "./types.js";
 import { calendarPageUrl, reportPageUrl } from "./types.js";
 
@@ -23,6 +23,6 @@ export const legacyHtmlReport: ReportSource = {
   canRun: () => true,
   async getReport(request, ctx) {
     const html = await ctx.getPage(reportPageUrl(ctx.baseUrl, request.competitionId, request.matchId));
-    return parseReportHtml(html, request);
+    return parseFullReportHtml(html, request);
   },
 };

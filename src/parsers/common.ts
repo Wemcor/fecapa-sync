@@ -13,19 +13,33 @@ export function fromSpanishDate(value: string): string | null {
   return `${match[3]}-${match[2]}-${match[1]}`;
 }
 
-export function buildMatch(competitionId: number, raw: Omit<Match, "competitionId" | "startsAt">): Match {
+type RawMatch = Omit<Match, "competitionId" | "startsAt" | "phaseId" | "phaseName" | "round" | "venue"> &
+  Partial<Pick<Match, "phaseId" | "phaseName" | "round" | "venue">>;
+
+export function buildMatch(competitionId: number, raw: RawMatch): Match {
   const match: Match = {
     competitionId,
+    phaseId: raw.phaseId ?? null,
+    phaseName: raw.phaseName ?? null,
+    round: raw.round ?? null,
     homeId: raw.homeId,
     awayId: raw.awayId,
     homeName: raw.homeName,
     awayName: raw.awayName,
     date: raw.date,
     time: raw.time,
-    startsAt: toStartsAt(raw.date, raw.time),
+    startsAt: raw.date === null ? null : toStartsAt(raw.date, raw.time),
+    venue: raw.venue ?? null,
   };
   if (raw.matchId !== undefined) match.matchId = raw.matchId;
   return match;
+}
+
+/** Trimmed text, or null when empty or a SIDGAD placeholder (`--`). */
+export function optionalText(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const text = clean(value);
+  return text && text !== "--" ? text : null;
 }
 
 export function checkTeams(source: SourceName, actual: ExpectTeams, expected: ExpectTeams | undefined): void {
@@ -37,6 +51,10 @@ export function checkTeams(source: SourceName, actual: ExpectTeams, expected: Ex
 
 export function checkLineup(source: SourceName, participants: Participant[]): void {
   if (!participants.length) throw new FecapaError("EMPTY_LINEUP", "The finished report has no players for this side", { source });
+  checkDuplicates(source, participants);
+}
+
+export function checkDuplicates(source: SourceName, participants: Participant[]): void {
   const seen = new Set<number>();
   for (const participant of participants) {
     if (seen.has(participant.fecapaId)) {

@@ -1,11 +1,11 @@
 import { FecapaError, type SourceAttempt } from "./errors.js";
 import { HttpClient, type FetchLike } from "./http.js";
-import type { ReportRequest } from "./parsers/sidgad-json.js";
+import { toSideReport, type FullReportRequest } from "./parsers/sidgad-json.js";
 import { legacyHtmlCalendar, legacyHtmlReport } from "./sources/legacy-html.js";
 import { portalConfigCalendar, portalConfigReport } from "./sources/portal-config.js";
 import { sidgadApiCalendar, sidgadApiReport } from "./sources/sidgad-api.js";
 import type { CalendarSource, ReportSource, SourceContext } from "./sources/types.js";
-import { SOURCE_NAMES, type CalendarResult, type ExpectTeams, type ReportResult, type Side, type SourceName } from "./types.js";
+import { SOURCE_NAMES, type CalendarResult, type ExpectTeams, type FullReportResult, type ReportResult, type Side, type SourceName } from "./types.js";
 import { DEFAULT_USER_AGENT } from "./version.js";
 
 export const DEFAULT_BASE_URL = "https://www.hoqueipatins.fecapa.cat";
@@ -30,6 +30,8 @@ export type ClientOptions = {
   delayMs?: number;
   /** Per-request timeout, in ms. Default 20000. */
   timeoutMs?: number;
+  /** How to wait `delayMs` between requests. For tests; defaults to a real timer. */
+  sleep?: (ms: number) => Promise<void>;
 };
 
 export type GetReportOptions = {
@@ -41,11 +43,15 @@ export type GetReportOptions = {
   expectTeams?: ExpectTeams;
 };
 
+export type GetFullReportOptions = Omit<GetReportOptions, "side">;
+
 export type FecapaClient = {
   /** All fixtures of a competition. */
   getCalendar(idc: number): Promise<CalendarResult>;
-  /** One side of a match report. `report` is `null` while the match is not finished. */
+  /** One side of a match report. `report` is `null` unless `status` is `"final"`. */
   getReport(matchId: number, options: GetReportOptions): Promise<ReportResult>;
+  /** Both lineups of a match report, in one request. `report` is `null` unless `status` is `"final"`. */
+  getFullReport(matchId: number, options: GetFullReportOptions): Promise<FullReportResult>;
 };
 
 const CALENDAR_SOURCES: Record<SourceName, CalendarSource> = {
@@ -86,14 +92,16 @@ export function createClient(options: ClientOptions = {}): FecapaClient {
     userAgent: options.userAgent ?? DEFAULT_USER_AGENT,
     delayMs,
     timeoutMs: options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+    ...(options.sleep ? { sleep: options.sleep } : {}),
   });
+  const cache = new Map<string, unknown>();
   const baseUrl = (options.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, "");
   const apiUrl = (options.apiUrl ?? DEFAULT_API_URL).replace(/\/+$/, "");
 
   const newContext = (): SourceContext => {
     const pages = new Map<string, Promise<string>>();
     const ctx: SourceContext = {
-      http, baseUrl, apiUrl,
+      http, baseUrl, apiUrl, cache,
       getPage(url) {
         let page = pages.get(url);
         if (!page) {
@@ -132,6 +140,15 @@ export function createClient(options: ClientOptions = {}): FecapaClient {
     throw new FecapaError("ALL_SOURCES_FAILED", `All sources failed (${summary})`, { attempts });
   }
 
+  function fullRequest(matchId: number, opts: GetFullReportOptions | undefined): FullReportRequest {
+    const request: FullReportRequest = {
+      matchId: positiveInteger(matchId, "matchId"),
+      competitionId: positiveInteger(opts?.idc, "idc"),
+    };
+    if (opts?.expectTeams) request.expectTeams = opts.expectTeams;
+    return request;
+  }
+
   return {
     async getCalendar(idc) {
       const competitionId = positiveInteger(idc, "idc");
@@ -139,17 +156,19 @@ export function createClient(options: ClientOptions = {}): FecapaClient {
       return { source, matches: value };
     },
     async getReport(matchId, opts) {
-      const request: ReportRequest = {
-        matchId: positiveInteger(matchId, "matchId"),
-        competitionId: positiveInteger(opts?.idc, "idc"),
-        side: opts?.side,
-      };
-      if (request.side !== "home" && request.side !== "away") {
+      const request = fullRequest(matchId, opts);
+      const side = opts?.side;
+      if (side !== "home" && side !== "away") {
         throw new FecapaError("INVALID_ARGUMENT", 'side must be "home" or "away"', { argument: "side" });
       }
-      if (opts.expectTeams) request.expectTeams = opts.expectTeams;
       const { source, value } = await run(REPORT_SOURCES, (s, ctx) => s.getReport(request, ctx));
-      return { source, report: value };
+      if (value.status !== "final") return { source, status: value.status, report: null };
+      return { source, status: "final", report: toSideReport(value.report, side, source) };
+    },
+    async getFullReport(matchId, opts) {
+      const request = fullRequest(matchId, opts);
+      const { source, value } = await run(REPORT_SOURCES, (s, ctx) => s.getReport(request, ctx));
+      return value.status === "final" ? { source, status: "final", report: value.report } : { source, status: value.status, report: null };
     },
   };
 }

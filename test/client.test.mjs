@@ -50,7 +50,7 @@ test('with a token, sidgad-api is tried first and wins', async () => {
   const { fetch, calls } = fakeFetch([[TOKEN_API, () => json(jsonFixture('sidgad-api/2026-11-calendar.json'))]]);
   const result = await client(fetch, { token: 'secret-token' }).getCalendar(4811);
   assert.equal(result.source, 'sidgad-api');
-  assert.equal(result.matches.length, 2);
+  assert.equal(result.matches.length, 3);
   assert.equal(calls.length, 1);
   assert.equal(calls[0].url, `${TOKEN_API}calendar/?id=4811&jwt=secret-token`);
 });
@@ -156,7 +156,7 @@ test('getReport: portal-config reads the config from the match page; an unfinish
     [PORTAL_API, () => json(jsonFixture('sidgad-api/2026-11-report-pending.json'))],
   ]);
   const result = await client(fetch).getReport(900501, { idc: 4811, side: 'home' });
-  assert.deepEqual(result, { source: 'portal-config', report: null });
+  assert.deepEqual(result, { source: 'portal-config', status: 'not-finished', report: null });
   assert.deepEqual(calls.map((c) => c.url), [`${PAGE}&partido=900501`, `${PORTAL_API}report/?id=900501&jwt=public-token`]);
 });
 
@@ -200,4 +200,48 @@ test('requests run one at a time with the configured delay between them', async 
   assert.equal(maxActive, 1);
   assert.equal(starts.length, 3);
   for (let i = 1; i < starts.length; i++) assert.ok(starts[i] - starts[i - 1] >= 40, `gap ${starts[i] - starts[i - 1]}ms`);
+});
+
+test('getReport and getFullReport: SIDGAD "NO FILE" is status no-file, answered by the first source without falling back', async () => {
+  const { fetch, calls } = fakeFetch([[TOKEN_API, () => json({ status: 'NO FILE' })]]);
+  const c = client(fetch, { token: 't' });
+  assert.deepEqual(await c.getReport(900501, { idc: 4811, side: 'home' }), { source: 'sidgad-api', status: 'no-file', report: null });
+  assert.deepEqual(await c.getFullReport(900501, { idc: 4811 }), { source: 'sidgad-api', status: 'no-file', report: null });
+  assert.equal(calls.length, 2);
+});
+
+test('getFullReport returns both lineups from one request', async () => {
+  const { fetch, calls } = fakeFetch([[TOKEN_API, () => json(jsonFixture('sidgad-api/2026-11-report-finished.json'))]]);
+  const result = await client(fetch, { token: 't' }).getFullReport(900501, { idc: 4811 });
+  assert.equal(result.status, 'final');
+  assert.equal(result.report.home.length, 2);
+  assert.equal(result.report.away.length, 1);
+  assert.equal(calls.length, 1);
+});
+
+test('portal-config reads the public config page once per client and reuses it', async () => {
+  const { fetch, calls } = fakeFetch([
+    [isPortal, () => html(fixture('portal-config/2026-11-calendar-page.html'))],
+    [PORTAL_API, (url) => json(jsonFixture(url.includes('/calendar/') ? 'sidgad-api/2026-11-calendar.json' : 'sidgad-api/2026-11-report-finished.json'))],
+  ]);
+  const c = client(fetch);
+  await c.getCalendar(4811);
+  await c.getFullReport(900501, { idc: 4811 });
+  await c.getCalendar(4812);
+  assert.deepEqual(calls.map((call) => call.url), [
+    PAGE, `${PORTAL_API}calendar/?id=4811&jwt=public-token`, `${PORTAL_API}report/?id=900501&jwt=public-token`, `${PORTAL_API}calendar/?id=4812&jwt=public-token`,
+  ]);
+});
+
+test('portal-config reads the page again after a refusal (the public token may have changed)', async () => {
+  let refuse = true;
+  const { fetch, calls } = fakeFetch([
+    [isPortal, () => html(fixture('portal-config/2026-11-calendar-page.html'))],
+    [PORTAL_API, () => json(refuse ? { status: 'INVALID TOKEN' } : jsonFixture('sidgad-api/2026-11-calendar.json'))],
+  ]);
+  const c = client(fetch, { sources: ['portal-config'] });
+  await assert.rejects(c.getCalendar(4811), { code: 'SOURCE_REJECTED' });
+  refuse = false;
+  await c.getCalendar(4811);
+  assert.equal(calls.filter((call) => isPortal(call.url)).length, 2);
 });

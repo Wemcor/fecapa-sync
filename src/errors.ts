@@ -29,6 +29,10 @@ export const ErrorCode = {
   NO_SOURCE_AVAILABLE: "NO_SOURCE_AVAILABLE",
   /** A caller passed an invalid argument. Context: `argument`. */
   INVALID_ARGUMENT: "INVALID_ARGUMENT",
+  /** The sync configuration is invalid or asks for something not available yet. Context: `detail`. */
+  INVALID_CONFIG: "INVALID_CONFIG",
+  /** A file in the local store can't be read as what it should be. Context: `detail` (the path). */
+  STORE_CORRUPT: "STORE_CORRUPT",
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
