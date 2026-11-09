@@ -6,6 +6,12 @@ FECAPA (Federació Catalana de Patinatge), independent de qualsevol club.
 > **Estat:** pre-1.0. L'API pot canviar entre versions 0.x. Encara no està
 > publicada a npm. Vegeu [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
+> **Sincronitza poc, no sovint.** L'objectiu és una còpia local en JSON: una
+> sincronització completa inicial i després sincronitzacions programades
+> (una o dues per setmana) que només baixen el que encara pot canviar.
+> Sincronitzar-ho tot sovint pot bloquejar la teva IP o saturar el servidor de
+> la FECAPA per a tothom. Vegeu [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
 ## Instal·lació
 
 Requereix Node.js 20.19 o superior. Mentre no estigui a npm, es pot instal·lar
@@ -68,6 +74,11 @@ server-rendered HTML (`legacy-html`), tried in that order. Errors are
 `TEAMS_MISMATCH`, …). The client is polite: honest User-Agent, one request at a
 time, a configurable delay between requests. See the Catalan example above and
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
+**Sync rarely, not often.** The goal is a local JSON copy: one full sync, then
+scheduled syncs (once or twice a week) that only fetch what can still change.
+Syncing everything often can get your IP blocked or overload FECAPA's servers
+for everyone. See [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Llicència
 
