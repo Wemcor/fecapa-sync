@@ -119,6 +119,7 @@ function toRunError(error: unknown): RunError {
     const result: RunError = { code: error.code, message: error.message };
     if (error.status !== undefined) result.status = error.status;
     if (error.source !== undefined) result.source = error.source;
+    if (error.retryAfterMs !== undefined) result.retryAfterMs = error.retryAfterMs;
     return result;
   }
   return { code: "UNEXPECTED", message: error instanceof Error ? error.message : String(error) };
@@ -317,7 +318,8 @@ export function createSync(options: CreateSyncOptions, runtime: SyncRuntime = {}
         const failures = (state.backoff?.failures ?? 0) + 1;
         const now = clock();
         const runError = toRunError(error);
-        const backoff: Backoff = { failures, until: new Date(now.getTime() + backoffDelay(failures)).toISOString(), lastError: runError };
+        const delay = Math.max(backoffDelay(failures), runError.retryAfterMs ?? 0);
+        const backoff: Backoff = { failures, until: new Date(now.getTime() + delay).toISOString(), lastError: runError };
         result.status = "failed";
         result.reason = null;
         result.requests = budget.used;

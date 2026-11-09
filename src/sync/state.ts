@@ -16,7 +16,7 @@ export type SeasonState = {
   actas: { pending: Record<string, PendingActa> };
 };
 
-export type RunError = { code: string; message: string; status?: number | string; source?: string };
+export type RunError = { code: string; message: string; status?: number | string; source?: string; retryAfterMs?: number };
 
 export type Backoff = {
   /** Consecutive failed runs. */

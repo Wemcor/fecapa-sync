@@ -24,10 +24,18 @@ function madridInstant(year: number, month: number, day: number, hour: number, m
 
 /** Parses `YYYY-MM-DD` (or the legacy `YYYYMMDD`) into numbers. */
 export function parseDate(date: string): { year: number; month: number; day: number } {
-  const match = /^(\d{4})-?(\d{2})-?(\d{2})$/.exec(date);
+  const normalized = /^\d{8}$/.test(date) ? `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}` : date;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(normalized);
   if (!match) throw new FecapaError("INVALID_ARGUMENT", `Invalid date "${date}", expected YYYY-MM-DD`, { argument: "date" });
   const [, year, month, day] = match;
-  return { year: Number(year), month: Number(month), day: Number(day) };
+  const result = { year: Number(year), month: Number(month), day: Number(day) };
+  const check = new Date(0);
+  check.setUTCFullYear(result.year, result.month - 1, result.day);
+  if (result.year < 1 || check.getUTCFullYear() !== result.year
+      || check.getUTCMonth() + 1 !== result.month || check.getUTCDate() !== result.day) {
+    throw new FecapaError("INVALID_ARGUMENT", `Invalid calendar date "${date}"`, { argument: "date" });
+  }
+  return result;
 }
 
 /**
@@ -39,7 +47,7 @@ export function parseDate(date: string): { year: number; month: number; day: num
  */
 export function toStartsAt(date: string, time: string | null): string {
   const { year, month, day } = parseDate(date);
-  const timeMatch = /^(\d{1,2}):(\d{2})$/.exec(time ?? "00:00");
+  const timeMatch = /^([01]?\d|2[0-3]):([0-5]\d)$/.exec(time ?? "00:00");
   if (!timeMatch) throw new FecapaError("INVALID_ARGUMENT", `Invalid time "${time}", expected HH:MM`, { argument: "time" });
   return madridInstant(year, month, day, Number(timeMatch[1]), Number(timeMatch[2])).toISOString();
 }

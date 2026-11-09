@@ -70,6 +70,11 @@ const REPORT_SOURCES: Record<SourceName, ReportSource> = {
 // teams, a broken lineup) is about the data and would be the same everywhere.
 const FALL_THROUGH = new Set<string>(["HTTP_ERROR", "NETWORK_ERROR", "EMPTY_RESPONSE", "SOURCE_FORMAT_CHANGED", "SOURCE_REJECTED"]);
 
+function isAccessRefusal(error: FecapaError): boolean {
+  return (error.code === "HTTP_ERROR" && (error.status === 403 || error.status === 429))
+    || (error.code === "SOURCE_REJECTED" && error.status !== "NO FILE");
+}
+
 function positiveInteger(value: unknown, argument: string): number {
   if (typeof value !== "number" || !Number.isSafeInteger(value) || value <= 0) {
     throw new FecapaError("INVALID_ARGUMENT", `${argument} must be a positive integer`, { argument });
@@ -128,6 +133,8 @@ export function createClient(options: ClientOptions = {}): FecapaClient {
       } catch (error) {
         if (!(error instanceof FecapaError)) throw error;
         if (error.source === undefined) (error as { source?: SourceName }).source = name;
+        // Refusal is not a format mismatch: let the caller persist a backoff.
+        if (isAccessRefusal(error)) throw error;
         if (!FALL_THROUGH.has(error.code)) throw error;
         attempts.push({ source: name, error });
       }

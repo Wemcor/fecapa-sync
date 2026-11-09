@@ -136,6 +136,8 @@ La llibreria es comporta com un client públic educat: s'identifica amb
 fa les peticions d'una en una i espera `delayMs` (per defecte 1000 ms) entre
 peticions. No falseja cap navegador. Mai no publiquis un token SIDGAD al codi.
 
+Consulteu també [`docs/HARDENING.md`](docs/HARDENING.md) per a la validació de marcadors i dates i el tractament de refusos.
+
 ## English
 
 Open-source, club-agnostic TypeScript library that keeps a local JSON copy of

@@ -110,6 +110,7 @@ export function parseCalendarJson(input: unknown, competitionId: number, source:
     const date = NO_DATE.has(day) ? null : fromSpanishDate(day);
     if (date === null && !NO_DATE.has(day)) throw formatChanged(source, `games: unexpected dia_partido "${day}"`);
     const time = clean(game.hora_partido ?? "");
+    if (date !== null && time && !TIME_RE.test(time)) throw formatChanged(source, "games: invalid hora_partido");
     matches.push(buildMatch(competitionId, {
       matchId: Number(id), homeId: Number(homeId), awayId: Number(awayId), homeName, awayName,
       date, time: date !== null && TIME_RE.test(time) ? time : null,
@@ -124,6 +125,16 @@ function sidgadCount(value: unknown, source: SourceName, field: string): number 
   if (typeof value === "number" && Number.isInteger(value) && value >= 0) return value;
   if (typeof value === "string" && DIGITS.test(value)) return Number(value);
   throw formatChanged(source, `${field} is not a count`);
+}
+
+/** Missing optional counters may mean zero; a missing final score never does. */
+function sidgadScore(value: unknown, source: SourceName, field: string): number {
+  if (value === null || value === undefined || value === "") {
+    throw formatChanged(source, `${field} is missing from a finished report`);
+  }
+  const score = sidgadCount(value, source, field);
+  if (!Number.isSafeInteger(score)) throw formatChanged(source, `${field} is not a safe integer`);
+  return score;
 }
 
 // SIDGAD writes names as "SURNAME(S),GIVEN".
@@ -205,8 +216,8 @@ export function parseReportOutcomeJson(input: unknown, request: FullReportReques
       competitionId: request.competitionId,
       homeName,
       awayName,
-      homeScore: sidgadCount(data.home_team_score, source, "home_team_score"),
-      awayScore: sidgadCount(data.away_team_score, source, "away_team_score"),
+      homeScore: sidgadScore(data.home_team_score, source, "home_team_score"),
+      awayScore: sidgadScore(data.away_team_score, source, "away_team_score"),
       venue: optionalText(data.venue_info),
       phaseName: optionalText(data.tournament_name),
       home,

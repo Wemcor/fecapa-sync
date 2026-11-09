@@ -14,6 +14,17 @@ export type HttpOptions = {
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
+function retryAfterMs(value: string | null): number | undefined {
+  if (value === null) return undefined;
+  const text = value.trim();
+  if (/^\d+$/.test(text)) {
+    const delay = Number(text) * 1000;
+    return Number.isSafeInteger(delay) ? delay : undefined;
+  }
+  const date = Date.parse(text);
+  return Number.isFinite(date) ? Math.max(0, date - Date.now()) : undefined;
+}
+
 /**
  * A deliberately polite HTTP client: one request at a time, a pause between
  * requests, an honest User-Agent, and no browser impersonation.
@@ -55,7 +66,10 @@ export class HttpClient {
         throw new FecapaError("NETWORK_ERROR", `Request failed: ${safeUrl}`, { url: safeUrl }, { cause: error });
       }
       if (!response.ok) {
-        throw new FecapaError("HTTP_ERROR", `HTTP ${response.status} from ${safeUrl}`, { status: response.status, url: safeUrl });
+        const delay = retryAfterMs(response.headers.get("retry-after"));
+        throw new FecapaError("HTTP_ERROR", `HTTP ${response.status} from ${safeUrl}`, {
+          status: response.status, url: safeUrl, ...(delay !== undefined ? { retryAfterMs: delay } : {}),
+        });
       }
       const text = await response.text();
       if (!text.trim()) throw new FecapaError("EMPTY_RESPONSE", `Empty response from ${safeUrl}`, { url: safeUrl });

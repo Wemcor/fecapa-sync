@@ -102,13 +102,13 @@ test('a zod schema failure is SOURCE_FORMAT_CHANGED naming the source', async ()
 
 test('when several sources fail, ALL_SOURCES_FAILED lists every attempt in order', async () => {
   const { fetch } = fakeFetch([
-    [TOKEN_API, () => json({ status: 'INVALID DOMAIN' })],
+    [TOKEN_API, () => json({ games: null })],
     [isPortal, () => html('<html><body>maintenance</body></html>')],
   ]);
   await assert.rejects(client(fetch, { token: 't' }).getCalendar(4811), (error) => {
     assert.equal(error.code, 'ALL_SOURCES_FAILED');
     assert.deepEqual(error.attempts.map((a) => [a.source, a.error.code]), [
-      ['sidgad-api', 'SOURCE_REJECTED'],
+      ['sidgad-api', 'SOURCE_FORMAT_CHANGED'],
       ['portal-config', 'SOURCE_FORMAT_CHANGED'],
       ['legacy-html', 'SOURCE_FORMAT_CHANGED'],
     ]);
